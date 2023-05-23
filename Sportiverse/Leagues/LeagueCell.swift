@@ -23,9 +23,9 @@ class LeagueCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func populateCell(with league: [String: Any], placeHolder: String){
-        leagueName.text = (league["league_name"] as! String)
-        leagueLogo.sd_setImage(with: URL(string: league["league_logo"] as? String ?? ""), placeholderImage: UIImage(named: placeHolder))
+    func populateCell(with league: League, placeHolder: String){
+        leagueName.text = league.league_name ?? league.country_name
+        leagueLogo.sd_setImage(with: URL(string: league.league_logo ?? ""), placeholderImage: UIImage(named: placeHolder))
         leagueLogo.makeRounded()
     }
 }
