@@ -10,15 +10,16 @@ import Reachability
 
 class LeaguesView: UITableViewController {
     let cellIdentifier = "leagueCell"
-    var url = ""
     var sportName = ""
     let activityIndicator = UIActivityIndicatorView(style: .large)
-    
+    var db: Database!
     var leagues = [League]()
-    
+    var viewModel: LeaguesViewModel!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        db = Database.instance
+        viewModel = LeaguesViewModel(db: Database.instance, api: API.instance, sportType: sportName){ [weak self] result in self?.renderData(result)
+        }
         navigationItem.titleView = UILabel().make(title: sportName)
         
         activityIndicator.color = .blue
@@ -28,47 +29,26 @@ class LeaguesView: UITableViewController {
         
         tableView.register(UINib(nibName: "LeagueCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         
-        let reachability = try! Reachability()
-        if reachability.connection == .unavailable {
-            activityIndicator.stopAnimating()
-            let label = UILabel()
-            label.text = "No Connection!"
-            label.center = view.center
-            view.addSubview(label)
-        } else {
-            getLeagues()
-        }
-                
+        viewModel.fetchLeagues()
     }
     
-    // MARK: - Get Data From URL
-    
-    func getLeagues(){
-        API.instance.getLeagues(of: sportName){ [weak self] result in
-            self?.renderData(result)
-            print("api closure")
-        }
-    }
+    // MARK: - Render Data On UI
  
-    
-    
-    func renderData(_ result: Result<LeaguesResponse, Error>){
+    func renderData(_ result: Result<[League], Error>){
         DispatchQueue.main.async { [weak self] in
             switch result {
                 
             case .failure(let error):
                 self?.showError(error)
                 
-            case .success(let leaguesResponse):
-                if leaguesResponse.result!.isEmpty{
-                    self?.showError(NSError(domain: "local", code: 0, userInfo: [NSLocalizedDescriptionKey: "Add Some To Favorites :DDD"]))
-                } else {
-                    self?.showLeagues(leaguesResponse.result!)
-                }
+            case .success(let leagues):
+                self?.showLeagues(leagues)
+                
             }
         }
-        
     }
+    
+    // MARK: - Error state
     
     func showError(_ error: Error){
         print("errored out ?")
@@ -78,7 +58,7 @@ class LeaguesView: UITableViewController {
         // TODO: show the user there is a freakin error *_*
     }
     
-    
+    // MARK: - Success State
     func showLeagues(_ leagues: [League]){
         print("showing leagues !!!")
         self.leagues = leagues
@@ -117,14 +97,15 @@ internal extension LeaguesView {
         return leagues.count
     }
 
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! LeagueCell
         let league = leagues[indexPath.row]
         
         cell.populateCell(with: league, placeHolder: sportName.lowercased())
+//        { [weak self] in
+//            self?.viewModel.toggleFavorite(league: $0)
+//        }
         print("\(league.league_name ?? league.country_name ?? "no league nor country name ?!")")
-        
         return cell
     }
 }

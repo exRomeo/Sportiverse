@@ -7,7 +7,7 @@
 
 import Foundation
 
-class LeaguesResponse: Codable {
+class LeaguesResponse: Decodable {
     let success: Int?
     let result: [League]?
     

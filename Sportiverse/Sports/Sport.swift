@@ -11,11 +11,9 @@ class Sport {
     
     let name: String
     let animName:String
-    let url: URL?
     
-    init(name: String, animName: String, url: String) {
+    init(name: String, animName: String) {
         self.name = name
         self.animName = animName
-        self.url = URL(string: url)
     }
 }
