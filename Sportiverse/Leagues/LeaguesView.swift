@@ -12,13 +12,11 @@ class LeaguesView: UITableViewController {
     let cellIdentifier = "leagueCell"
     var sportName = ""
     let activityIndicator = UIActivityIndicatorView(style: .large)
-    var db: Database!
     var leagues = [League]()
     var viewModel: LeaguesViewModel!
     override func viewDidLoad() {
         super.viewDidLoad()
-        db = Database.instance
-        viewModel = LeaguesViewModel(db: Database.instance, api: API.instance, sportType: sportName){ [weak self] result in self?.renderData(result)
+        viewModel = LeaguesViewModel(db: Database.instance, api: API.shared, sportType: sportName){ [weak self] result in self?.renderData(result)
         }
         navigationItem.titleView = UILabel().make(title: sportName)
         
@@ -33,7 +31,7 @@ class LeaguesView: UITableViewController {
     }
     
     // MARK: - Render Data On UI
- 
+    
     func renderData(_ result: Result<[League], Error>){
         DispatchQueue.main.async { [weak self] in
             switch result {
@@ -68,23 +66,6 @@ class LeaguesView: UITableViewController {
 }
 
 
-extension UILabel {
-    func show(errorMessage error:Error, on view: UIView){
-        text = error.localizedDescription
-        textAlignment = .center
-        textColor = .systemRed
-        font = UIFont.boldSystemFont(ofSize: 28)
-        view.addSubview(self)
-        numberOfLines = 2
-        frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
-    }
-    
-    func make(title:String) -> UILabel {
-        text = title
-        font = UIFont.boldSystemFont(ofSize: 28)
-        return self
-    }
-}
 
 
 internal extension LeaguesView {
@@ -96,16 +77,24 @@ internal extension LeaguesView {
         // #warning Incomplete implementation, return the number of rows
         return leagues.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! LeagueCell
         let league = leagues[indexPath.row]
         
         cell.populateCell(with: league, placeHolder: sportName.lowercased())
-//        { [weak self] in
-//            self?.viewModel.toggleFavorite(league: $0)
-//        }
+        { [weak self] in
+            self?.viewModel.toggleFavorite(league: $0)
+            self?.tableView.reloadData()
+        }
         print("\(league.league_name ?? league.country_name ?? "no league nor country name ?!")")
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
+        leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: sportName)
+        navigationController?.pushViewController(leagueDetails, animated: true)
+        
     }
 }

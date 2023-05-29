@@ -9,39 +9,43 @@ import Foundation
 import UIKit
 import CoreData
 
-//https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey=48422a8f49fb7d10f0f909621d840392f5abdcb5a7a96f8164d7402326a1abc5&from=2023-05-25&to=2023-05-30&leagueId=322
 class API {
     private let baseURL = "https://apiv2.allsportsapi.com/"
     private let apiKey = "48422a8f49fb7d10f0f909621d840392f5abdcb5a7a96f8164d7402326a1abc5"
-    private let football = "football/"
-    private let basketball = "basketball/"
-    private let cricket = "cricket/"
-    private let tennis = "tennis/"
-    private let leagues = "Leagues"
-    private let fixtures = "Fixtures"
-    private let livescore = "Livescore"
-    static let instance = API()
+    static let shared = API()
+    
     private var context: NSManagedObjectContext!
-    private init(){
-        self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    }
+      private init(){
+          self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+      }
     
-    //MARK: - Leagues
+
     
-    func getLeagues(of name:String, onCompletion: @escaping (Result<[League], Error>) -> Void){
-        let urlString = "\(baseURL + name.lowercased())/?met=\(leagues)&APIkey=\(apiKey)"
+    // MARK: - Leagues
+    
+    func getLeagues(of name: String, onCompletion: @escaping (Result<[League], Error>) -> Void) {
+        let urlString = "\(baseURL)\(name.lowercased())/?met=Leagues&APIkey=\(apiKey)"
         print("get Leagues from \(urlString)")
-        let url = URL(string: urlString)
-        let task = URLSession.shared.dataTask(with: url!) {
-            (data, response, error) in
-            if let error = error {
-                print("why erroring ? \(error.localizedDescription)")
-                onCompletion(.failure(error))
-            }
-            if let data = data {
-                onCompletion(self.decodeLeagues(from: data, type: name))
-            }
+        guard let url = URL(string: urlString) else {
+            onCompletion(.failure(APIError.invalidUrl))
+            return
         }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("URL session error -> \(error.localizedDescription)")
+                onCompletion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                onCompletion(.failure(APIError.noResponse))
+                return
+            }
+            
+            onCompletion(self.decodeLeagues(from: data, type: name))
+        }
+        
         task.resume()
     }
     
@@ -50,70 +54,139 @@ class API {
         decoder.userInfo[CodingUserInfoKey.context] = context
         decoder.userInfo[CodingUserInfoKey.sportType] = type
         
-        print("decoder")
+        print("decoder working on Leagues")
         do {
             let response: LeaguesResponse = try decoder.decode(LeaguesResponse.self, from: data)
-            return .success(response.result!)
+            guard let result = response.result else {
+                return .failure(APIError.emptyList)
+            }
+            return .success(result)
         } catch {
-            print("error decoding ?!")
+            print("decoder error -> \(error.localizedDescription)")
             return .failure(error)
         }
     }
     
-    //MARK: - Eventes
+    // MARK: - Events
     
-    func getUpcomingEvents(of sportType: String, leagueID: Int, from startDate:String, to endDate:String, onCompletion: @escaping (Result<[Event], Error>) -> Void ) {
-        
-        let urlString = "\(baseURL + sportType.lowercased())/?met=\(fixtures)&APIkey=\(apiKey)&from=\(startDate)&to\(endDate)&leagueId=\(leagueID)"
+    func getUpcomingEvents(of sportType: String, leagueID: Int, from startDate: String, to endDate: String, onCompletion: @escaping (Result<[Event], Error>) -> Void ) {
+        let urlString = "\(baseURL)\(sportType.lowercased())/?met=Fixtures&APIkey=\(apiKey)&from=\(startDate)&to=\(endDate)&leagueId=\(leagueID)"
         
         print("get League Details from = \(urlString)")
-        let url = URL(string: urlString)
-        let task = URLSession.shared.dataTask(with: url!) { (data, response, error) in
-            if let error = error {
-                print("why erroring ? \(error.localizedDescription)")
-                onCompletion(.failure(error))
-            }
-            if let data = data {
-                onCompletion(self.decodeLeagueDetails(from: data))
-            }
+        guard let url = URL(string: urlString) else {
+            onCompletion(.failure(APIError.invalidUrl))
+            return
         }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("URL session error -> \(error.localizedDescription)")
+                onCompletion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                onCompletion(.failure(APIError.noResponse))
+                return
+            }
+            
+            onCompletion(self.decodeEvents(from: data))
+        }
+        
         task.resume()
     }
     
     func getLivescores(of sportType: String, leagueID: Int, onCompletion: @escaping (Result<[Event], Error>) -> Void ) {
-        
-        let urlString = "\(baseURL + sportType.lowercased())/?met=\(fixtures)&APIkey=\(apiKey)&leagueId=\(leagueID)"
+        let urlString = "\(baseURL)\(sportType.lowercased())/?met=Livescore&APIkey=\(apiKey)"
         
         print("get League Details from = \(urlString)")
-        let url = URL(string: urlString)
-        let task = URLSession.shared.dataTask(with: url!) { (data, response, error) in
-            if let error = error {
-                print("why erroring ? \(error.localizedDescription)")
-                onCompletion(.failure(error))
-            }
-            if let data = data {
-                onCompletion(self.decodeLeagueDetails(from: data))
-            }
+        guard let url = URL(string: urlString) else {
+            onCompletion(.failure(APIError.invalidUrl))
+            return
         }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("URL session error -> \(error.localizedDescription)")
+                onCompletion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                onCompletion(.failure(APIError.noResponse))
+                return
+            }
+            
+            onCompletion(self.decodeEvents(from: data))
+        }
+        
         task.resume()
     }
     
-    private func decodeLeagueDetails(from data: Data) -> Result<[Event], Error> {
+    private func decodeEvents(from data: Data) -> Result<[Event], Error> {
         let decoder = JSONDecoder()
-       
-        print("decoder")
+        print("decoding events")
         do {
             let response: EventsResponse = try decoder.decode(EventsResponse.self, from: data)
-            return .success(response.result!)
+            guard let result = response.result else {
+                return .failure(APIError.emptyList)
+            }
+            return .success(result)
         } catch {
-            print("error decoding ?!")
+            print("decoder error -> \(error.localizedDescription)")
             return .failure(error)
         }
     }
     
+    // MARK: - Teams
     
-    func getTeams(of sportType:String){
-        //https://apiv2.allsportsapi.com/football/?met=Teams&APIkey=48422a8f49fb7d10f0f909621d840392f5abdcb5a7a96f8164d7402326a1abc5&leagueId=322
+    func getTeams(of sportType: String, leagueID: Int, onCompletion: @escaping (Result<[Team], Error>) -> Void ) {
+        let urlString = "\(baseURL)\(sportType.lowercased())/?met=Teams&APIkey=\(apiKey)&leagueId=\(leagueID)"
+        print("get Teams from = \(urlString)")
+        guard let url = URL(string: urlString) else {
+            onCompletion(.failure(APIError.invalidUrl))
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("URL session error -> \(error.localizedDescription)")
+                onCompletion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                onCompletion(.failure(APIError.noResponse))
+                return
+            }
+            
+            onCompletion(self.decodeTeam(from: data))
+        }
+        
+        task.resume()
     }
     
+    private func decodeTeam(from data: Data) -> Result<[Team], Error> {
+        let decoder = JSONDecoder()
+        print("Decoding Teams")
+        do {
+            let response: TeamsResponse = try decoder.decode(TeamsResponse.self, from: data)
+            guard let result = response.result else {
+                return .failure(APIError.emptyList)
+            }
+            return .success(result)
+        } catch {
+            print("decoder error -> \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
 }
+
+extension API {
+    enum APIError: String, Error {
+        case invalidUrl = "URL is invalid!"
+        case noResponse = "Recieved no response!"
+        case emptyList = "Found no results"
+    }
+}
+

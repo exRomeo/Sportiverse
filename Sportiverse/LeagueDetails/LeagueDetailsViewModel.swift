@@ -9,35 +9,52 @@ import Foundation
 
 class LeagueDetailsViewModel {
     
-    private var upComingEvents: Result<[Event], Error>!  {
+    
+    private var upComingEvents: Result<[Event], Error>! {
         didSet {
             onUpComingUpdated(upComingEvents)
         }
     }
-    private var liveScore: Result<[Event], Error>!  {
+    private var liveScore: Result<[Event], Error>! {
         didSet {
-            onUpComingUpdated(upComingEvents)
+            onLiveScoreUpdated(liveScore)
         }
     }
-    private var teams: Result<[Team], Error>!  {
+    private var teams: Result<[Team], Error>! {
         didSet {
-            onUpComingUpdated(upComingEvents)
+            onTeamsUpdated(teams)
         }
     }
     
 //    private let db: Database
     private let api: API
+    var sportType: String
+    var leagueID: Int
     private let onUpComingUpdated: (Result<[Event], Error>) -> ()
     private let onLiveScoreUpdated: (Result<[Event], Error>) -> ()
-    private let onTeamsUpdated: (Result<[Event], Error>) -> ()
+    private let onTeamsUpdated: (Result<[Team], Error>) -> ()
     
-    init(upComingEvents: Result<[Event], Error>!, liveScore: Result<[Event], Error>!, teams: Result<[Team], Error>!, api: API, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Event], Error>) -> Void) {
-        self.upComingEvents = upComingEvents
-        self.liveScore = liveScore
-        self.teams = teams
+    init(api: API,sportType: String, leagueID:Int, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Team], Error>) -> Void) {
         self.api = api
+        self.sportType = sportType.lowercased()
+        self.leagueID = leagueID
         self.onUpComingUpdated = onUpComingUpdated
         self.onLiveScoreUpdated = onLiveScoreUpdated
         self.onTeamsUpdated = onTeamsUpdated
     }
+    
+    func getLeagueDetails(){
+        api.getUpcomingEvents(of: sportType, leagueID: leagueID, from: DateUtil().getTimeRange().startDate, to: DateUtil().getTimeRange().endDate) {
+            self.upComingEvents = $0
+        }
+        
+        api.getLivescores(of: sportType, leagueID: leagueID) {
+            self.liveScore = $0
+        }
+        
+        api.getTeams(of: sportType, leagueID: leagueID) {
+            self.teams = $0
+        }
+    }
+
 }
