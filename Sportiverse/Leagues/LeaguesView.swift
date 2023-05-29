@@ -85,7 +85,6 @@ internal extension LeaguesView {
         cell.populateCell(with: league, placeHolder: sportName.lowercased())
         { [weak self] in
             self?.viewModel.toggleFavorite(league: $0)
-            self?.tableView.reloadData()
         }
         print("\(league.league_name ?? league.country_name ?? "no league nor country name ?!")")
         return cell

@@ -67,6 +67,5 @@ class LeaguesViewModel {
     func toggleFavorite(league: League){
         league.isFavorite.toggle()
         db.commit()
-        onStateUpdated(state)
     }
 }

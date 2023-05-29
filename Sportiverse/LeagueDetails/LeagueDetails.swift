@@ -118,15 +118,15 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             
         case topCollectionView :
             // Return the item size for the top and bottom collection views (horizontal scrolling)
-            let itemWidth = collectionView.bounds.width - 11
+            let itemWidth = centerCollectionView.bounds.width
             let itemHeight = collectionView.bounds.height
             return CGSize(width: itemWidth, height: itemHeight)
             
         case centerCollectionView:
             // Return the item size for the middle collection view (vertical scrolling)
             let itemWidth = collectionView.bounds.width
-            let itemHeight = collectionView.bounds.height
-            return CGSize(width: itemWidth, height: itemHeight/2.5)
+            let itemHeight = 134.0
+            return CGSize(width: itemWidth, height: itemHeight)
             
         case bottomCollectionView:
             let itemWidth = 106.0
@@ -149,7 +149,7 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             
         case centerCollectionView:
             //Adjust the inset for the middle collection view (vertical scrolling)
-            return UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
+            return UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
             
         case bottomCollectionView:
             //Adjust the inset for the bottom collection view (horizontal scrolling)

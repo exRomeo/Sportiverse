@@ -139,7 +139,6 @@ class API {
     }
     
     // MARK: - Teams
-    
     func getTeams(of sportType: String, leagueID: Int, onCompletion: @escaping (Result<[Team], Error>) -> Void ) {
         let urlString = "\(baseURL)\(sportType.lowercased())/?met=Teams&APIkey=\(apiKey)&leagueId=\(leagueID)"
         print("get Teams from = \(urlString)")

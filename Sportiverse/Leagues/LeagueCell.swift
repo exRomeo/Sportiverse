@@ -10,7 +10,7 @@ import SDWebImage
 import Lottie
 
 class LeagueCell: UITableViewCell {
-
+    
     @IBOutlet weak var leagueLogo: UIImageView!
     @IBOutlet weak var leagueName: UILabel!
     @IBOutlet var animatedButton: LottieAnimationView!
@@ -20,43 +20,51 @@ class LeagueCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-
+        
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupAnimationView()
+    }
+    
+    private func setupAnimationView() {
+        animatedButton = LottieAnimationView()
     }
     
     func populateCell(with league: League, placeHolder: String, onFavoriteClicked: @escaping (League) -> Void){
-//    func populateCell(with league: League, placeHolder: String){
         self.onFavoriteClicked = onFavoriteClicked
         self.league = league
+        
         leagueName.text = league.league_name ?? league.country_name
         leagueLogo.sd_setImage(with: URL(string: league.league_logo ?? ""), placeholderImage: UIImage(named: placeHolder))
-        leagueLogo.makeRounded()
         
-        animatedButton = LottieAnimationView()
+        leagueLogo.makeRounded()
+        setupAnimatedButton()
+    }
+    
+    private func setupAnimatedButton(){
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleFav))
         animatedButton.addGestureRecognizer(tapGesture)
-        animatedButton.isUserInteractionEnabled = true
-
+        
         animatedButton.animation = LottieAnimation.named("heart_anim")
-        animatedButton.contentMode = .scaleAspectFit
-        animatedButton.loopMode = .loop
-        animatedButton.play()
         if league.isFavorite {
-            animatedButton.play(fromFrame: animatedButton.animation?.duration ?? 0, toFrame: 0, loopMode: .playOnce){_ in}
+            animatedButton.play(fromProgress: 0.7, toProgress: 0.7, loopMode: .playOnce)
         } else {
-            animatedButton.play(fromProgress: 0, toProgress: 1, loopMode: .playOnce)
+            animatedButton.play(fromProgress: 0, toProgress: 0, loopMode: .playOnce)
         }
     }
     
     @objc
     func toggleFav(){
         onFavoriteClicked(league)
-        print(league.isFavorite)
+        print("cell button \(league.isFavorite)")
+        print("cell button Tappy Tap")
+        if league.isFavorite {
+            animatedButton.play(fromProgress: 0, toProgress: 0.7, loopMode: .playOnce)
+        } else {
+            animatedButton.play(fromProgress: 0.7, toProgress: 0, loopMode: .playOnce)
+        }
     }
 }
 
