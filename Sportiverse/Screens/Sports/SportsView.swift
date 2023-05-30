@@ -72,7 +72,7 @@ extension SportsView: UICollectionViewDelegateFlowLayout {
         print("clicked a cell \(viewModel.sports[indexPath.row].name)")
         let leaguesScreen = storyboard?.instantiateViewController(withIdentifier: "leaguesScreen") as! LeaguesView
             
-        leaguesScreen.sportName = viewModel.sports[indexPath.row].name
+        leaguesScreen.instantiateViewModel(sportType: viewModel.sports[indexPath.row].name) 
         navigationController?.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(leaguesScreen, animated: true)
     }

@@ -10,28 +10,28 @@ import Reachability
 
 class LeaguesView: UITableViewController {
     let cellIdentifier = "leagueCell"
-    var sportName = ""
     let activityIndicator = UIActivityIndicatorView(style: .large)
     var leagues = [League]()
     var viewModel: LeaguesViewModel!
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel = LeaguesViewModel(db: Database.instance, api: API.shared, sportType: sportName){ [weak self] result in self?.renderData(result)
-        }
-        navigationItem.titleView = UILabel().make(title: sportName)
+
+        navigationItem.titleView = UILabel().make(title: viewModel.sportType)
         
-        activityIndicator.color = .blue
-        activityIndicator.center = view.center
-        activityIndicator.startAnimating()
-        view.addSubview(activityIndicator)
+        activityIndicator.addIndicator(to: view)
         
         tableView.register(UINib(nibName: "LeagueCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         
         viewModel.fetchLeagues()
     }
     
-    // MARK: - Render Data On UI
     
+    func instantiateViewModel(sportType: String){
+        viewModel = LeaguesViewModel(db: Database.instance, api: API.shared, sportType: sportType){ [weak self] result in self?.renderData(result)
+        }
+    }
+    
+    // MARK: - Render Data On UI
     func renderData(_ result: Result<[League], Error>){
         DispatchQueue.main.async { [weak self] in
             switch result {
@@ -74,7 +74,6 @@ internal extension LeaguesView {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         return leagues.count
     }
     
@@ -82,18 +81,21 @@ internal extension LeaguesView {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! LeagueCell
         let league = leagues[indexPath.row]
         
-        cell.populateCell(with: league, placeHolder: sportName.lowercased())
+        cell.populateCell(with: league, placeHolder: viewModel.sportType.lowercased())
         { [weak self] in
             self?.viewModel.toggleFavorite(league: $0)
         }
-        print("\(league.league_name ?? league.country_name ?? "no league nor country name ?!")")
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
-        leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: sportName)
-        navigationController?.pushViewController(leagueDetails, animated: true)
-        
+        if viewModel.isConnected {
+            let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
+            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: viewModel.sportType)
+            navigationController?.pushViewController(leagueDetails, animated: true)
+        } else {
+            UIAlertController.showNoInternetDialog(from: self)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

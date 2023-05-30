@@ -9,7 +9,7 @@ import Foundation
 import Reachability
 
 class LeaguesViewModel {
-   
+    
     private var state: Result<[League], Error>! {
         didSet {
             onStateUpdated(state)
@@ -18,7 +18,7 @@ class LeaguesViewModel {
     private let db: Database
     private let api: API
     private let onStateUpdated: (Result<[League], Error>) -> ()
-    private let sportType: String
+    let sportType: String
     
     init(db: Database, api: API, sportType: String, onStateUpdated: @escaping (Result<[League], Error>) -> ()) {
         self.db = db
@@ -27,19 +27,26 @@ class LeaguesViewModel {
         self.onStateUpdated = onStateUpdated
     }
     
+    var isConnected:Bool {
+        let reachability = try? Reachability()
+        return reachability?.connection != .unavailable
+    }
+    
     func fetchLeagues(){
-        let reachability = try! Reachability()
-        if reachability.connection != .unavailable {
-            db.getAllLeagues(filteredBy: sportType) {
-                updateState($0)
-            }
-            api.getLeagues(of: sportType) {
-                self.updateState($0)
-            }
-        } else {
-            db.getAllLeagues(filteredBy: sportType) {
-                updateState($0)
-            }
+        getLeaguesFromDataBase()
+        if isConnected {
+            updateLeagues()
+        }
+    }
+    
+    private func updateLeagues(){
+        api.getLeagues(of: sportType) {
+            self.updateState($0)
+        }
+    }
+    private func getLeaguesFromDataBase() {
+        db.getAllLeagues(filteredBy: sportType) {
+            updateState($0)
         }
     }
     
@@ -48,20 +55,16 @@ class LeaguesViewModel {
         switch result {
         case .success(_):
             db.commit()
-            db.getAllLeagues(filteredBy: sportType) {
-                updateState($0)
-            }
+            getLeaguesFromDataBase()
         case .failure(_):
             state = result
         }
     }
     
     private func updateState(_ leagues: [League]){
-        if leagues.count == 0 {
-//            state = .failure(NSError(domain: "empty array", code: 0, userInfo: [NSLocalizedDescriptionKey: "list is empty"]))
-        } else {
-            state = .success(leagues)
-        }
+        
+        state = .success(leagues)
+        
     }
     
     func toggleFavorite(league: League){

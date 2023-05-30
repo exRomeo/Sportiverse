@@ -36,6 +36,18 @@ class Database{
         }
     }
     
+    func getAllFavorites(onCompletion: ([League]) -> Void) {
+        let fetchRequest = NSFetchRequest<League>(entityName: leagueEntity)
+        
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == true")
+        
+        do {
+            onCompletion(try managedContext.fetch(fetchRequest))
+        } catch {
+            onCompletion([League]())
+        }
+    }
+    
     func commit(){
         do {
             try managedContext.save()

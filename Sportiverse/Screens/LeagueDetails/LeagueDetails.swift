@@ -14,18 +14,28 @@ class LeagueDetails: UIViewController {
     private let topCollectionReusableID = "topCell"
     @IBOutlet weak var topCollectionView: UICollectionView!
     private var upComing = [Event]()
+    var topIndicator = UIActivityIndicatorView(style: .large)
     private let centerCollectionReusableID = "centerCell"
     @IBOutlet weak var centerCollectionView: UICollectionView!
     private var liveScore = [Event]()
+    var centerIndicator = UIActivityIndicatorView(style: .large)
     private let bottomCollectionReusableID = "bottomCell"
     @IBOutlet weak var bottomCollectionView: UICollectionView!
     private var teams = [Team]()
+    var bottomIndicator = UIActivityIndicatorView(style: .large)
     private var viewModel: LeagueDetailsViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         prepareCollectionViews()
+        addActivityIndicators()
         viewModel.getLeagueDetails()
+    }
+    
+    private func addActivityIndicators(){
+        topIndicator.addIndicator(to: topCollectionView)
+        centerIndicator.addIndicator(to: centerCollectionView)
+        bottomIndicator.addIndicator(to: bottomCollectionView)
     }
     
     func prepareCollectionViews(){
@@ -159,6 +169,16 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             return UIEdgeInsets()
         }
     }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == bottomCollectionView && viewModel.sportType.lowercased() == "football" {
+            let teamDetailsScreen = storyboard?.instantiateViewController(withIdentifier: "teamDetailsScreen") as! TeamDetails
+            teamDetailsScreen.instantiateViewModel(team: teams[indexPath.row])
+            
+            navigationController?.pushViewController(teamDetailsScreen, animated: true)
+        }
+    }
 }
 
 
@@ -170,6 +190,7 @@ extension LeagueDetails {
         case .success(let data):
             upComing = data
             DispatchQueue.main.async {
+                self.topIndicator.stopAnimating()
                 self.topCollectionView.reloadData()
             }
             
@@ -177,7 +198,10 @@ extension LeagueDetails {
             switch error {
             case API.APIError.emptyList:
                 print("renderTopCollection errored out -> \((error as! API.APIError).rawValue)")
-                showError(collectionView: topCollectionView, message: (error as! API.APIError).rawValue)
+                DispatchQueue.main.async {
+                    self.topIndicator.stopAnimating()
+                    self.showError(collectionView: self.topCollectionView, message: API.APIError.emptyList.rawValue)
+                }
             default:
                 print("renderTopCollection errored out -> \(error.localizedDescription)")
                 
@@ -190,6 +214,7 @@ extension LeagueDetails {
         case .success(let data):
             liveScore = data
             DispatchQueue.main.async {
+                self.centerIndicator.stopAnimating()
                 self.centerCollectionView.reloadData()
             }
             
@@ -197,6 +222,10 @@ extension LeagueDetails {
             switch error {
             case API.APIError.emptyList:
                 print("renderCenterCollection errored out -> \((error as! API.APIError).rawValue)")
+                DispatchQueue.main.async {
+                    self.centerIndicator.stopAnimating()
+                    self.showError(collectionView: self.centerCollectionView, message: API.APIError.emptyList.rawValue)
+                }
             default:
                 print("renderCenterCollection errored out -> \(error.localizedDescription)")
                 
@@ -209,12 +238,17 @@ extension LeagueDetails {
         case .success(let data):
             teams = data
             DispatchQueue.main.async {
+                self.bottomIndicator.stopAnimating()
                 self.bottomCollectionView.reloadData()
             }
         case .failure(let error):
             switch error {
             case API.APIError.emptyList:
                 print("renderBottomCollection errored out -> \((error as! API.APIError).rawValue)")
+                DispatchQueue.main.async {
+                    self.bottomIndicator.stopAnimating()
+                    self.showError(collectionView: self.bottomCollectionView, message: API.APIError.emptyList.rawValue)
+                }
                 
             default:
                 print("renderBottomCollection errored out -> \(error.localizedDescription)")
@@ -225,8 +259,6 @@ extension LeagueDetails {
     }
     
     func showError(collectionView: UICollectionView, message: String){
-        DispatchQueue.main.async {
-            UILabel().show(errorMessage: message, on: collectionView)
-        }
+        UILabel().show(errorMessage: message, on: collectionView)
     }
 }
