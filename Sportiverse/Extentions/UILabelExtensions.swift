@@ -9,19 +9,19 @@ import Foundation
 import UIKit
 
 extension UILabel {
+    
     func show(errorMessage error:Error, on view: UIView){
-        text = error.localizedDescription
-        textAlignment = .center
-        textColor = .systemRed
-        font = UIFont.boldSystemFont(ofSize: 28)
-        view.addSubview(self)
-        numberOfLines = 2
-        frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height)
+        showMessage(error.localizedDescription, with: .systemRed, on: view)
     }
+    
     func show(errorMessage :String, on view: UIView){
-        text = errorMessage
+        showMessage(errorMessage, with: .systemRed, on: view)
+    }
+    
+    func showMessage(_ message:String, with color: UIColor, on view:UIView){
+        text = message
         textAlignment = .center
-        textColor = .systemRed
+        textColor = color
         font = UIFont.boldSystemFont(ofSize: 28)
         view.addSubview(self)
         numberOfLines = 2

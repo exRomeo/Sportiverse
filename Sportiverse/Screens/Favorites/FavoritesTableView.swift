@@ -28,8 +28,6 @@ class FavoritesTableView: UITableViewController {
         }
         
         setupView()
-        
-        
     }
     
     private func setupView(){
@@ -57,13 +55,8 @@ class FavoritesTableView: UITableViewController {
         DispatchQueue.main.async { [weak self] in
             switch result {
                 
-            case .failure(let error):
-                switch error {
-                case API.APIError.emptyList:
-                    self?.showError("Add Some Leagues To Favorites")
-                default:
-                    self?.showError(error.localizedDescription)
-                }
+            case .failure(_):
+                    self?.showEmptyListMessage()
                 
             case .success(let leagues):
                 self?.showLeagues(leagues)
@@ -71,13 +64,14 @@ class FavoritesTableView: UITableViewController {
         }
     }
     
-    // MARK: - Error state
+    // MARK: - User has no favorites
     
-    func showError(_ errorMessage: String){
+    func showEmptyListMessage(){
         activityIndicator.stopAnimating()
         leagues = [League]()
         tableView.reloadData()
-        UILabel().show(errorMessage: errorMessage, on: view)
+        
+        UILabel().showMessage("Add Some Leagues To Favorites", with: .lightGray, on: view)
     }
     
     // MARK: - Success State
@@ -105,14 +99,23 @@ internal extension FavoritesTableView {
         { [weak self] in
             self?.viewModel.toggleFavorite(league: $0)
         }
-        print("\(league.league_name ?? "")")
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
-        leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: leagues[indexPath.row].sportType!)
-        navigationController?.pushViewController(leagueDetails, animated: true)
+        
+        if viewModel.isConnected {
+            
+            let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
+            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: leagues[indexPath.row].sportType!)
+            navigationController?.pushViewController(leagueDetails, animated: true)
+            
+        } else {
+            
+            UIAlertController.showNoInternetDialog(from: self)
+        }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 

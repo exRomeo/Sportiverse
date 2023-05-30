@@ -43,8 +43,10 @@ class favoritesViewModel{
     }
     
     func toggleFavorite(league: League){
-        league.isFavorite.toggle()
-        db.commit()
-        fetchLeagues()
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.55){
+            league.isFavorite.toggle()
+            self.db.commit()
+            self.fetchLeagues()
+        }
     }
 }

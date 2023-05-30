@@ -48,8 +48,9 @@ class LeagueCell: UITableViewCell {
         animatedButton.addGestureRecognizer(tapGesture)
         
         animatedButton.animation = LottieAnimation.named("heart_anim")
+        animatedButton.animationSpeed = 2
         if league.isFavorite {
-            animatedButton.play(fromProgress: 0.7, toProgress: 0.7, loopMode: .playOnce)
+            animatedButton.play(fromProgress: 1.0, toProgress: 1.0, loopMode: .playOnce)
         } else {
             animatedButton.play(fromProgress: 0, toProgress: 0, loopMode: .playOnce)
         }
@@ -58,12 +59,10 @@ class LeagueCell: UITableViewCell {
     @objc
     func toggleFav(){
         onFavoriteClicked(league)
-        print("cell button \(league.isFavorite)")
-        print("cell button Tappy Tap")
         if league.isFavorite {
-            animatedButton.play(fromProgress: 0, toProgress: 0.7, loopMode: .playOnce)
+            animatedButton.play(fromProgress: 0, toProgress: 1.0, loopMode: .playOnce)
         } else {
-            animatedButton.play(fromProgress: 0.7, toProgress: 0, loopMode: .playOnce)
+            animatedButton.play(fromProgress: 1.0, toProgress: 0, loopMode: .playOnce)
         }
     }
 }

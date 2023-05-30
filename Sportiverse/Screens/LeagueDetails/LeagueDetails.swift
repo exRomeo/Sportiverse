@@ -169,6 +169,16 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             return UIEdgeInsets()
         }
     }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == bottomCollectionView && viewModel.sportType.lowercased() == "football" {
+            let teamDetailsScreen = storyboard?.instantiateViewController(withIdentifier: "teamDetailsScreen") as! TeamDetails
+            teamDetailsScreen.instantiateViewModel(team: teams[indexPath.row])
+            
+            navigationController?.pushViewController(teamDetailsScreen, animated: true)
+        }
+    }
 }
 
 
