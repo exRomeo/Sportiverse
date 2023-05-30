@@ -4,7 +4,6 @@
         <attribute name="country_key" optional="YES" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="country_logo" optional="YES" attributeType="String"/>
         <attribute name="country_name" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="league_key" optional="YES" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="league_logo" optional="YES" attributeType="String"/>
@@ -13,7 +12,7 @@
         <attribute name="sportType" optional="YES" attributeType="String"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
-                <constraint value="id"/>
+                <constraint value="league_key"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>

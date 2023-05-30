@@ -57,11 +57,9 @@ class LeaguesViewModel {
     }
     
     private func updateState(_ leagues: [League]){
-        if leagues.count == 0 {
-//            state = .failure(NSError(domain: "empty array", code: 0, userInfo: [NSLocalizedDescriptionKey: "list is empty"]))
-        } else {
-            state = .success(leagues)
-        }
+        
+        state = .success(leagues)
+        
     }
     
     func toggleFavorite(league: League){

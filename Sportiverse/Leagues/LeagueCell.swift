@@ -37,7 +37,7 @@ class LeagueCell: UITableViewCell {
         self.league = league
         
         leagueName.text = league.league_name ?? league.country_name
-        leagueLogo.sd_setImage(with: URL(string: league.league_logo ?? ""), placeholderImage: UIImage(named: placeHolder))
+        leagueLogo.sd_setImage(with: URL(string: league.league_logo ?? ""), placeholderImage: UIImage(named: placeHolder.lowercased()))
         
         leagueLogo.makeRounded()
         setupAnimatedButton()

@@ -20,10 +20,7 @@ class LeaguesView: UITableViewController {
         }
         navigationItem.titleView = UILabel().make(title: sportName)
         
-        activityIndicator.color = .blue
-        activityIndicator.center = view.center
-        activityIndicator.startAnimating()
-        view.addSubview(activityIndicator)
+        activityIndicator.addIndicator(to: view)
         
         tableView.register(UINib(nibName: "LeagueCell", bundle: nil), forCellReuseIdentifier: cellIdentifier)
         
@@ -31,7 +28,6 @@ class LeaguesView: UITableViewController {
     }
     
     // MARK: - Render Data On UI
-    
     func renderData(_ result: Result<[League], Error>){
         DispatchQueue.main.async { [weak self] in
             switch result {
