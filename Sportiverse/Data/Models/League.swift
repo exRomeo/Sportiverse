@@ -57,6 +57,5 @@ public class League: NSManagedObject, Decodable {
 extension CodingUserInfoKey {
     static let context = CodingUserInfoKey(rawValue: "context")!
     static let sportType = CodingUserInfoKey(rawValue: "sportType")!
-    
 }
 

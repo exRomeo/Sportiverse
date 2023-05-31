@@ -34,13 +34,13 @@ class TopCollectionViewCell: UICollectionViewCell {
     
     func populateCell(with event:Event, placeHolder: String){
         score.text = event.eventFinalResult
-        homeTeamName.text = event.eventHomeTeam
-        awayTeamName.text = event.eventAwayTeam
+        homeTeamName.text = event.eventHomeTeam ?? event.eventFirstPlayer
+        awayTeamName.text = event.eventAwayTeam ?? event.eventSecondPlayer
         matchDate.text = event.eventDate
         time.text = event.eventTime
-        homeTeamImage.sd_setImage(with: URL(string:event.homeTeamLogo ?? ""), placeholderImage: UIImage(named: placeHolder))
+        homeTeamImage.sd_setImage(with: URL(string:event.homeTeamLogo ?? event.eventFirstPlayerLogo ?? ""), placeholderImage: UIImage(named: placeHolder))
         homeTeamImage.makeRounded()
-        awayTeamImage.sd_setImage(with: URL(string:event.awayTeamLogo ?? ""), placeholderImage: UIImage(named: placeHolder))
+        awayTeamImage.sd_setImage(with: URL(string:event.awayTeamLogo ?? event.eventSecondPlayerLogo ?? ""), placeholderImage: UIImage(named: placeHolder))
         awayTeamImage.makeRounded()
         
 

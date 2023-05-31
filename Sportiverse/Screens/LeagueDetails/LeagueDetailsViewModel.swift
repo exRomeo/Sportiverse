@@ -9,7 +9,7 @@ import Foundation
 
 class LeagueDetailsViewModel {
     
-    
+    private var players = [Team]()
     private var upComingEvents: Result<[Event], Error>! {
         didSet {
             onUpComingUpdated(upComingEvents)
@@ -26,7 +26,6 @@ class LeagueDetailsViewModel {
         }
     }
     
-//    private let db: Database
     private let api: API
     var sportType: String
     var leagueID: Int
@@ -46,15 +45,32 @@ class LeagueDetailsViewModel {
     func getLeagueDetails(){
         api.getUpcomingEvents(of: sportType, leagueID: leagueID, from: DateUtil().getTimeRange().startDate, to: DateUtil().getTimeRange().endDate) {
             self.upComingEvents = $0
+            self.extractPlayers(from: $0)
         }
         
         api.getLivescores(of: sportType, leagueID: leagueID) {
             self.liveScore = $0
+            self.extractPlayers(from: $0)
         }
-        
-        api.getTeams(of: sportType, leagueID: leagueID) {
-            self.teams = $0
+        if sportType != "tennis" {
+            api.getTeams(of: sportType, leagueID: leagueID) {
+                self.teams = $0
+            }
         }
     }
-
+    
+    private func extractPlayers(from result:Result <[Event], Error>){
+        if sportType == "tennis"{
+            switch result{
+            case .success(let events):
+            for event in events {
+                players.append(Team(name: event.eventFirstPlayer ?? "", logo: event.eventFirstPlayerLogo ?? ""))
+                players.append(Team(name: event.eventSecondPlayer ?? "", logo: event.eventSecondPlayerLogo ?? ""))
+            }
+            teams = .success(players)
+            default:
+                break
+            }
+        }
+    }
 }

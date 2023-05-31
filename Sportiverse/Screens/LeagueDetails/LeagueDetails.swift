@@ -40,10 +40,6 @@ class LeagueDetails: UIViewController {
     
     func prepareCollectionViews(){
         topCollectionView.register(UINib(nibName: "TopCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: topCollectionReusableID)
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.scrollDirection = .horizontal
-        topCollectionView.collectionViewLayout = flowLayout
-        topCollectionView.isPagingEnabled = true
         centerCollectionView.register(UINib(nibName: "TopCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: topCollectionReusableID)
         bottomCollectionView.register(UINib(nibName: "BottomCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: bottomCollectionReusableID)
     }
@@ -128,7 +124,7 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             
         case topCollectionView :
             // Return the item size for the top and bottom collection views (horizontal scrolling)
-            let itemWidth = centerCollectionView.bounds.width
+            let itemWidth = collectionView.bounds.width
             let itemHeight = collectionView.bounds.height
             return CGSize(width: itemWidth, height: itemHeight)
             
@@ -155,7 +151,8 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             
         case topCollectionView:
             // Adjust the inset for the top collection view (horizontal scrolling)
-            return UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+            
+            return UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
             
         case centerCollectionView:
             //Adjust the inset for the middle collection view (vertical scrolling)
