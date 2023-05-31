@@ -10,8 +10,8 @@ import UIKit
 
 extension UIImageView {
     func makeRounded(){
-        layer.backgroundColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
-        layer.cornerRadius = frame.width/2
+        layer.backgroundColor = UIColor.white.withAlphaComponent(0.05).cgColor
+        layer.cornerRadius = (frame.width + frame.height) / 4
         contentMode = .scaleAspectFit
     }
 }

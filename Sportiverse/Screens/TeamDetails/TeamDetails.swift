@@ -19,7 +19,6 @@ class TeamDetails : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.titleView = UILabel().make(title: viewModel.team.team_name ?? "")
-        
         tableView.register(UINib(nibName: "PlayerCell", bundle: nil), forCellReuseIdentifier: reusableCellIdentifier)
         teamLogo.sd_setImage(with: URL(string: viewModel.team.team_logo ?? ""), placeholderImage: UIImage(named: "football"))
         teamLogo.makeRounded()
@@ -43,5 +42,21 @@ extension TeamDetails: UITableViewDataSource, UITableViewDelegate {
         cell.populate(with:viewModel.team.players![indexPath.row])
         return cell
     }
-
 }
+
+
+extension TeamDetails {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        
+        let imageViewHeight = max(teamLogo.frame.height - offsetY, 100)
+        
+        teamLogo.constraints.forEach { constraint in
+            if constraint.firstAttribute == .height{
+                constraint.constant = imageViewHeight
+            }
+        }
+    }
+}
+

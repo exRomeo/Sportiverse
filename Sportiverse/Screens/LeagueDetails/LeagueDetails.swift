@@ -45,21 +45,23 @@ class LeagueDetails: UIViewController {
     }
     
     func instantiateViewModel(with leagueID: Int, and sportType:String){
+        let repository : IRepository = (UIApplication.shared.delegate as! AppDelegate).repository
+        
         self.viewModel =
-        LeagueDetailsViewModel(api: API.shared,
-                                                sportType: sportType,
-                                                leagueID: leagueID,
-                                                onUpComingUpdated: ({[weak self] result in
-                                                    self?.renderTopCollection(result)
+        LeagueDetailsViewModel(repository: repository,
+                               sportType: sportType,
+                               leagueID: leagueID,
+                               onUpComingUpdated: ({[weak self] result in
+            self?.renderTopCollection(result)
             
-                                                }), onLiveScoreUpdated: ({[weak self] result in
-                                                    self?.renderCenterCollection(result)
+        }), onLiveScoreUpdated: ({[weak self] result in
+            self?.renderCenterCollection(result)
             
-                                                }), onTeamsUpdated: ({[weak self] result in
-                                                    self?.renderBottomCollection(result)
+        }), onTeamsUpdated: ({[weak self] result in
+            self?.renderBottomCollection(result)
             
-                                                })
-                            )
+        })
+        )
     }
 }
 
@@ -89,7 +91,7 @@ extension LeagueDetails: UICollectionViewDelegateFlowLayout, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-
+        
         switch collectionView{
             
         case topCollectionView:
@@ -193,11 +195,10 @@ extension LeagueDetails {
             
         case .failure(let error):
             switch error {
-            case API.APIError.emptyList:
-                print("renderTopCollection errored out -> \((error as! API.APIError).rawValue)")
+            case AllSportsAPIService.APIError.emptyList:
                 DispatchQueue.main.async {
                     self.topIndicator.stopAnimating()
-                    self.showError(collectionView: self.topCollectionView, message: API.APIError.emptyList.rawValue)
+                    self.showError(collectionView: self.topCollectionView, message: AllSportsAPIService.APIError.emptyList.rawValue)
                 }
             default:
                 print("renderTopCollection errored out -> \(error.localizedDescription)")
@@ -217,11 +218,10 @@ extension LeagueDetails {
             
         case .failure(let error):
             switch error {
-            case API.APIError.emptyList:
-                print("renderCenterCollection errored out -> \((error as! API.APIError).rawValue)")
+            case AllSportsAPIService.APIError.emptyList:
                 DispatchQueue.main.async {
                     self.centerIndicator.stopAnimating()
-                    self.showError(collectionView: self.centerCollectionView, message: API.APIError.emptyList.rawValue)
+                    self.showError(collectionView: self.centerCollectionView, message: AllSportsAPIService.APIError.emptyList.rawValue)
                 }
             default:
                 print("renderCenterCollection errored out -> \(error.localizedDescription)")
@@ -240,11 +240,10 @@ extension LeagueDetails {
             }
         case .failure(let error):
             switch error {
-            case API.APIError.emptyList:
-                print("renderBottomCollection errored out -> \((error as! API.APIError).rawValue)")
+            case AllSportsAPIService.APIError.emptyList:
                 DispatchQueue.main.async {
                     self.bottomIndicator.stopAnimating()
-                    self.showError(collectionView: self.bottomCollectionView, message: API.APIError.emptyList.rawValue)
+                    self.showError(collectionView: self.bottomCollectionView, message: AllSportsAPIService.APIError.emptyList.rawValue)
                 }
                 
             default:

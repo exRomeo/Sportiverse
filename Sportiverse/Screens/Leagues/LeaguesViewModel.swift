@@ -15,14 +15,12 @@ class LeaguesViewModel {
             onStateUpdated(state)
         }
     }
-    private let db: Database
-    private let api: API
+    private let repository: IRepository
     private let onStateUpdated: (Result<[League], Error>) -> ()
     let sportType: String
     
-    init(db: Database, api: API, sportType: String, onStateUpdated: @escaping (Result<[League], Error>) -> ()) {
-        self.db = db
-        self.api = api
+    init(repository: IRepository, sportType: String, onStateUpdated: @escaping (Result<[League], Error>) -> ()) {
+        self.repository = repository
         self.sportType = sportType
         self.onStateUpdated = onStateUpdated
     }
@@ -40,12 +38,12 @@ class LeaguesViewModel {
     }
     
     private func updateLeagues(){
-        api.getLeagues(of: sportType) {
+        repository.getLeagues(of: sportType) {
             self.updateState($0)
         }
     }
     private func getLeaguesFromDataBase() {
-        db.getAllLeagues(filteredBy: sportType) {
+        repository.getAllLeagues(filteredBy: sportType) {
             updateState($0)
         }
     }
@@ -54,7 +52,7 @@ class LeaguesViewModel {
     private func updateState(_ result: Result<[League], Error>){
         switch result {
         case .success(_):
-            db.commit()
+            repository.commitChangesToDatabase()
             getLeaguesFromDataBase()
         case .failure(_):
             state = result
@@ -69,6 +67,6 @@ class LeaguesViewModel {
     
     func toggleFavorite(league: League){
         league.isFavorite.toggle()
-        db.commit()
+        repository.commitChangesToDatabase()
     }
 }
