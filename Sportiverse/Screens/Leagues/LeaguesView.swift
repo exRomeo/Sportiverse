@@ -27,7 +27,8 @@ class LeaguesView: UITableViewController {
     
     
     func instantiateViewModel(sportType: String){
-        viewModel = LeaguesViewModel(db: Database.instance, api: API.shared, sportType: sportType){ [weak self] result in self?.renderData(result)
+        let repository : IRepository = (UIApplication.shared.delegate as! AppDelegate).repository
+        viewModel = LeaguesViewModel(repository: repository, sportType: sportType){ [weak self] result in self?.renderData(result)
         }
     }
     
@@ -49,7 +50,6 @@ class LeaguesView: UITableViewController {
     // MARK: - Error state
     
     func showError(_ error: Error){
-        print("errored out ?")
         activityIndicator.stopAnimating()
         print(error.localizedDescription)
         UILabel().show(errorMessage: error, on: view)
@@ -58,7 +58,6 @@ class LeaguesView: UITableViewController {
     
     // MARK: - Success State
     func showLeagues(_ leagues: [League]){
-        print("showing leagues !!!")
         self.leagues = leagues
         activityIndicator.stopAnimating()
         tableView.reloadData()

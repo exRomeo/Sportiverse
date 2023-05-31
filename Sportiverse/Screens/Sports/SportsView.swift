@@ -69,7 +69,6 @@ extension SportsView: UICollectionViewDelegateFlowLayout {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("clicked a cell \(viewModel.sports[indexPath.row].name)")
         let leaguesScreen = storyboard?.instantiateViewController(withIdentifier: "leaguesScreen") as! LeaguesView
             
         leaguesScreen.instantiateViewModel(sportType: viewModel.sports[indexPath.row].name) 

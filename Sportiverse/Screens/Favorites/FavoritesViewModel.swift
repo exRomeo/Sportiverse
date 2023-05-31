@@ -15,7 +15,7 @@ class favoritesViewModel{
         }
     }
     
-    private let db: Database
+    private let repository: IRepository
     private let onStateUpdated: (Result<[League], Error>) -> ()
     
     var isConnected:Bool {
@@ -23,20 +23,20 @@ class favoritesViewModel{
         return reachability?.connection != .unavailable
     }
     
-    init(db: Database, onStateUpdated: @escaping (Result<[League], Error>) -> ()) {
-        self.db = db
+    init(repository: IRepository, onStateUpdated: @escaping (Result<[League], Error>) -> ()) {
+        self.repository = repository
         self.onStateUpdated = onStateUpdated
     }
     
     func fetchLeagues() {
-        db.getAllFavorites(){
+        repository.getAllFavorites(){
             self.updateState($0)
         }
     }
     
     private func updateState(_ leagues: [League]){
         if leagues.count == 0 {
-            state = .failure(API.APIError.emptyList)
+            state = .failure(AllSportsAPIService.APIError.emptyList)
         } else {
             state = .success(leagues)
         }
@@ -45,7 +45,7 @@ class favoritesViewModel{
     func toggleFavorite(league: League){
         DispatchQueue.global().asyncAfter(deadline: .now() + 0.55){
             league.isFavorite.toggle()
-            self.db.commit()
+            self.repository.commitChangesToDatabase()
             self.fetchLeagues()
         }
     }

@@ -24,7 +24,8 @@ class FavoritesTableView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.titleView = UILabel().make(title: "Favorites")
-        viewModel = favoritesViewModel(db: Database.instance) { [weak self] result in self?.renderData(result)
+        let repository : IRepository = (UIApplication.shared.delegate as! AppDelegate).repository
+        viewModel = favoritesViewModel(repository: repository) { [weak self] result in self?.renderData(result)
         }
         
         setupView()

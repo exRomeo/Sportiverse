@@ -26,15 +26,15 @@ class LeagueDetailsViewModel {
         }
     }
     
-    private let api: API
+    private let repository: IRepository
     var sportType: String
     var leagueID: Int
     private let onUpComingUpdated: (Result<[Event], Error>) -> ()
     private let onLiveScoreUpdated: (Result<[Event], Error>) -> ()
     private let onTeamsUpdated: (Result<[Team], Error>) -> ()
     
-    init(api: API,sportType: String, leagueID:Int, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Team], Error>) -> Void) {
-        self.api = api
+    init(repository: IRepository,sportType: String, leagueID:Int, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Team], Error>) -> Void) {
+        self.repository = repository
         self.sportType = sportType.lowercased()
         self.leagueID = leagueID
         self.onUpComingUpdated = onUpComingUpdated
@@ -43,17 +43,17 @@ class LeagueDetailsViewModel {
     }
     
     func getLeagueDetails(){
-        api.getUpcomingEvents(of: sportType, leagueID: leagueID, from: DateUtil().getTimeRange().startDate, to: DateUtil().getTimeRange().endDate) {
+        repository.getUpcomingEvents(of: sportType, leagueID: leagueID, from: DateUtil().getTimeRange().startDate, to: DateUtil().getTimeRange().endDate) {
             self.upComingEvents = $0
             self.extractPlayers(from: $0)
         }
         
-        api.getLivescores(of: sportType, leagueID: leagueID) {
+        repository.getLivescores(of: sportType, leagueID: leagueID) {
             self.liveScore = $0
             self.extractPlayers(from: $0)
         }
         if sportType != "tennis" {
-            api.getTeams(of: sportType, leagueID: leagueID) {
+            repository.getTeams(of: sportType, leagueID: leagueID) {
                 self.teams = $0
             }
         }
