@@ -18,6 +18,12 @@ class Team: Decodable {
     let team_logo: String?
     let players: [Player]?
     
+    init(name: String, logo:String) {
+        team_name = name
+        team_logo = logo
+        team_key = 0
+        players = [Player]()
+    }
 }
 
 class Player: Decodable {

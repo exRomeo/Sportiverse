@@ -70,9 +70,13 @@ class API {
     // MARK: - Events
     
     func getUpcomingEvents(of sportType: String, leagueID: Int, from startDate: String, to endDate: String, onCompletion: @escaping (Result<[Event], Error>) -> Void ) {
-        let urlString = "\(baseURL)\(sportType.lowercased())/?met=Fixtures&APIkey=\(apiKey)&from=\(startDate)&to=\(endDate)&leagueId=\(leagueID)"
-        
-        print("get League Details from = \(urlString)")
+        var urlString = ""
+        if sportType.lowercased() == "tennis" {
+            urlString = "\(baseURL)\(sportType.lowercased())/?met=Fixtures&APIkey=\(apiKey)&from=\(startDate)&to=\(endDate)"
+        } else{
+            urlString = "\(baseURL)\(sportType.lowercased())/?met=Fixtures&APIkey=\(apiKey)&from=\(startDate)&to=\(endDate)&leagueId=\(leagueID)"
+        }
+        print("get Fixtures from = \(urlString)")
         guard let url = URL(string: urlString) else {
             onCompletion(.failure(APIError.invalidUrl))
             return
@@ -99,7 +103,7 @@ class API {
     func getLivescores(of sportType: String, leagueID: Int, onCompletion: @escaping (Result<[Event], Error>) -> Void ) {
         let urlString = "\(baseURL)\(sportType.lowercased())/?met=Livescore&APIkey=\(apiKey)"
         
-        print("get League Details from = \(urlString)")
+        print("get Livescore from = \(urlString)")
         guard let url = URL(string: urlString) else {
             onCompletion(.failure(APIError.invalidUrl))
             return
