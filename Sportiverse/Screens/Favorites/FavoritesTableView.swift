@@ -108,7 +108,7 @@ internal extension FavoritesTableView {
         if viewModel.isConnected {
             
             let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
-            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: leagues[indexPath.row].sportType!)
+            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key), leagueName: leagues[indexPath.row].league_name ?? "", and: leagues[indexPath.row].sportType!)
             navigationController?.pushViewController(leagueDetails, animated: true)
             
         } else {

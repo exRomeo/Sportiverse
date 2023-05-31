@@ -28,14 +28,16 @@ class LeagueDetailsViewModel {
     
     private let repository: IRepository
     var sportType: String
+    var leagueName:String
     var leagueID: Int
     private let onUpComingUpdated: (Result<[Event], Error>) -> ()
     private let onLiveScoreUpdated: (Result<[Event], Error>) -> ()
     private let onTeamsUpdated: (Result<[Team], Error>) -> ()
     
-    init(repository: IRepository,sportType: String, leagueID:Int, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Team], Error>) -> Void) {
+    init(repository: IRepository, leagueName: String, sportType: String, leagueID:Int, onUpComingUpdated: @escaping (Result<[Event], Error>) -> Void, onLiveScoreUpdated: @escaping (Result<[Event], Error>) -> Void, onTeamsUpdated: @escaping (Result<[Team], Error>) -> Void) {
         self.repository = repository
         self.sportType = sportType.lowercased()
+        self.leagueName = leagueName
         self.leagueID = leagueID
         self.onUpComingUpdated = onUpComingUpdated
         self.onLiveScoreUpdated = onLiveScoreUpdated

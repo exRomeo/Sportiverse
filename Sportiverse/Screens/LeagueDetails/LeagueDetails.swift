@@ -11,6 +11,7 @@ private let reuseIdentifier = "Cell"
 
 class LeagueDetails: UIViewController {
     
+    @IBOutlet weak var teamsLabel: UILabel!
     private let topCollectionReusableID = "topCell"
     @IBOutlet weak var topCollectionView: UICollectionView!
     private var upComing = [Event]()
@@ -30,6 +31,10 @@ class LeagueDetails: UIViewController {
         prepareCollectionViews()
         addActivityIndicators()
         viewModel.getLeagueDetails()
+        navigationItem.titleView =  UILabel().make(title: viewModel.leagueName)
+        if viewModel.sportType == "tennis"{
+            teamsLabel.text = "Players"
+        }
     }
     
     private func addActivityIndicators(){
@@ -44,11 +49,12 @@ class LeagueDetails: UIViewController {
         bottomCollectionView.register(UINib(nibName: "BottomCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: bottomCollectionReusableID)
     }
     
-    func instantiateViewModel(with leagueID: Int, and sportType:String){
+    func instantiateViewModel(with leagueID: Int, leagueName: String, and sportType:String){
         let repository : IRepository = (UIApplication.shared.delegate as! AppDelegate).repository
         
         self.viewModel =
         LeagueDetailsViewModel(repository: repository,
+                               leagueName: leagueName,
                                sportType: sportType,
                                leagueID: leagueID,
                                onUpComingUpdated: ({[weak self] result in

@@ -11,7 +11,13 @@ import Reachability
 class LeaguesView: UITableViewController {
     let cellIdentifier = "leagueCell"
     let activityIndicator = UIActivityIndicatorView(style: .large)
-    var leagues = [League]()
+    var leagues: [League] = [League]() {
+        didSet {
+            filteredLeagues = leagues
+        }
+    }
+    
+    var filteredLeagues = [League]()
     var viewModel: LeaguesViewModel!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,12 +79,12 @@ internal extension LeaguesView {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return leagues.count
+        return filteredLeagues.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! LeagueCell
-        let league = leagues[indexPath.row]
+        let league = filteredLeagues[indexPath.row]
         
         cell.populateCell(with: league, placeHolder: viewModel.sportType.lowercased())
         { [weak self] in
@@ -90,11 +96,32 @@ internal extension LeaguesView {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if viewModel.isConnected {
             let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
-            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: viewModel.sportType)
+            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key), leagueName: leagues[indexPath.row].league_name ?? "", and: viewModel.sportType)
             navigationController?.pushViewController(leagueDetails, animated: true)
         } else {
             UIAlertController.showNoInternetDialog(from: self)
         }
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+extension LeaguesView: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            filteredLeagues = leagues
+        } else {
+            DispatchQueue.global(qos: .background).async { [weak self] in
+                let lowercaseSearchText = searchText.lowercased()
+                let filteredArray = self?.leagues.filter { league in
+                    let lowercaseWord = league.league_name!.lowercased()
+                    return lowercaseWord.contains(lowercaseSearchText)
+                }
+                
+                DispatchQueue.main.async {
+                    self?.filteredLeagues = filteredArray ?? []
+                    self?.tableView.reloadData()
+                }
+            }
+        }
     }
 }
