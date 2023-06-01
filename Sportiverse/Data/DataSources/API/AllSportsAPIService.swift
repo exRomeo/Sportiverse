@@ -80,8 +80,14 @@ class AllSportsAPIService :APIService {
     }
     
     func getLivescores(of sportType: String, leagueID: Int, onCompletion: @escaping (Result<[Event], Error>) -> Void) {
-        let urlString = "\(baseURL)\(sportType.lowercased())/?met=Livescore&APIkey=\(apiKey)"
         
+        var urlString = ""
+        if sportType != "tennis"{
+            urlString = "\(baseURL)\(sportType.lowercased())/?met=Livescore&APIkey=\(apiKey)&leagueId=\(leagueID)"
+        } else {
+            urlString = "\(baseURL)\(sportType.lowercased())/?met=Livescore&APIkey=\(apiKey)"
+        }
+        print(urlString)
         guard let url = URL(string: urlString) else {
             onCompletion(.failure(APIError.invalidUrl))
             return
