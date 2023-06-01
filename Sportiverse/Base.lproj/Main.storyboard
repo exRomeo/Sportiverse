@@ -78,9 +78,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" id="yjs-c8-thu">
+                            <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="Ya2-AJ-oLu" id="dQf-Xj-dtW"/>
+                            </connections>
+                        </searchBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="leagueCell" id="5Cq-vn-hIR" customClass="LeagueCell" customModule="Sportiverse" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="94" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="5Cq-vn-hIR" id="zp1-PT-k04">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
@@ -229,6 +237,7 @@
                     <connections>
                         <outlet property="bottomCollectionView" destination="rMS-Ig-KY5" id="VuO-Vj-K9p"/>
                         <outlet property="centerCollectionView" destination="sGl-dg-pY5" id="V5D-E2-tW1"/>
+                        <outlet property="teamsLabel" destination="0bV-NM-ORh" id="2QU-XE-ahH"/>
                         <outlet property="topCollectionView" destination="hth-tb-n7l" id="K4p-ND-l5Z"/>
                     </connections>
                 </viewController>

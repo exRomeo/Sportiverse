@@ -24,7 +24,8 @@ class FavoritesTableView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.titleView = UILabel().make(title: "Favorites")
-        viewModel = favoritesViewModel(db: Database.instance) { [weak self] result in self?.renderData(result)
+        let repository : IRepository = (UIApplication.shared.delegate as! AppDelegate).repository
+        viewModel = favoritesViewModel(repository: repository) { [weak self] result in self?.renderData(result)
         }
         
         setupView()
@@ -107,7 +108,7 @@ internal extension FavoritesTableView {
         if viewModel.isConnected {
             
             let leagueDetails = storyboard?.instantiateViewController(withIdentifier: "leagueDetailsScreen") as! LeagueDetails
-            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key ), and: leagues[indexPath.row].sportType!)
+            leagueDetails.instantiateViewModel(with: Int(leagues[indexPath.row].league_key), leagueName: leagues[indexPath.row].league_name ?? "", and: leagues[indexPath.row].sportType!)
             navigationController?.pushViewController(leagueDetails, animated: true)
             
         } else {

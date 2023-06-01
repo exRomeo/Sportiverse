@@ -9,9 +9,9 @@ import Foundation
 import CoreData
 import UIKit
 
-class Database{
+class Database: IDatabase {
     
-    static var instance: Database = {
+    static var shared: Database = {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         return Database(managedContext: delegate.persistentContainer.viewContext)
     }()
