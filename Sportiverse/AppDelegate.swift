@@ -11,9 +11,16 @@ import CoreData
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
+    var colorModeUtil = ColorModeUtil.shared
+    
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            return true
+        }
+        
+        colorModeUtil.currentMode = windowScene.traitCollection.userInterfaceStyle
         return true
     }
     

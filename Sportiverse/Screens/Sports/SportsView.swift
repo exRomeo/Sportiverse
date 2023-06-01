@@ -14,6 +14,7 @@ class SportsView: UICollectionViewController {
     
     
     var viewModel: SportsViewModel!
+    var toggleButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +22,7 @@ class SportsView: UICollectionViewController {
         setupPageTitle()
         setupGridView()
         setupSwipeGesture()
+        setupColorButton()
     }
     
     func setupPageTitle(){
@@ -48,6 +50,27 @@ class SportsView: UICollectionViewController {
     @objc
     func leftSwipeHandler(){
         tabBarController?.selectedIndex +=  1
+    }
+    
+    func setupColorButton() {
+        var iconName = ""
+        if ColorModeUtil.shared.currentMode == .light {
+            iconName = "sun.max.fill"
+        } else {
+            iconName = "moon.fill"
+        }
+        toggleButton = UIBarButtonItem(image: UIImage(systemName: iconName), style: .plain, target: self, action: #selector(toggleColor))
+        navigationItem.rightBarButtonItem = toggleButton
+
+        }
+    
+    @objc func toggleColor(){
+        ColorModeUtil.shared.toggleColorMode()
+        if ColorModeUtil.shared.currentMode == .light {
+            toggleButton.image = UIImage(systemName: "sun.max.fill") // Replace with your light mode icon system name
+        } else {
+            toggleButton.image = UIImage(systemName: "moon.fill") // Replace with your dark mode icon system name
+        }
     }
 }
 
@@ -93,5 +116,5 @@ extension SportsView {
         cell.sportTitle.text = viewModel.sports[indexPath.row].name
         return cell
     }
-    
 }
+
