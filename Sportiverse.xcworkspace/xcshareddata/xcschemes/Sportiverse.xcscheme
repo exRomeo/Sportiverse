@@ -29,7 +29,10 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:../Sportiverse.xctestplan"
+            reference = "container:../Sportiverse.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:SportiverseTests.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
