@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "7E1805E0-B186-4D55-A06B-4C84DA42E405",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Sportiverse.xcodeproj",
+        "identifier" : "EE4175E12A17DB0500CD2FBA",
+        "name" : "SportiverseTests"
+      }
+    }
+  ],
+  "version" : 1
+}
